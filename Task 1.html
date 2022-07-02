@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<body>
+
+<h1>Calculator</h1>
+
+
+  <label for="intCalc">Input</label>
+  <input type="text" id="intCalc" name="intCalc"><br><br>
+  <button onclick="calculate()">Calculate</button><br><br>
+  <canvas id="myChart" style="height: 800px;width:200px;visibility: hidden;"></canvas>
+<script>
+function calculate(){
+var input = document.getElementById("intCalc").value
+input = input.toLowerCase().replace(/ /g,'');
+if(input.indexOf("x") > -1){
+  document.getElementById("myChart").style = {visibility:"block"}
+  var xyValues = [];
+  for(i=0;i<200;i++){
+  let inputStr = input.replace("x","*"+ i)
+  console.log(inputStr)
+  let y = handlebasicCalc(inputStr)
+  xyValues.push({'x':i,'y':y})
+  }
+  new Chart("myChart", {
+  type: "scatter",
+  data: {
+    datasets: [{
+      pointRadius: 4,
+      pointBackgroundColor: "rgb(0,0,0)",
+      data: xyValues
+    }]
+  },
+  options: {
+    legend: {display: false},
+    scales: {
+      xAxes: [{ticks: {min: 0, max:1000}}],
+      yAxes: [{ticks: {min: 0, max:1000}}],
+    }
+  }
+});
+}else{
+splessInput = input.replace(/ /g,'')
+document.write(commaReplacement(splessInput))
+}
+}
+
+function commaReplacement(e){
+let openMatch = e.match(/\)/g)
+let closeMatch = e.match(/\(/g)
+if( (openMatch && closeMatch) && ((openMatch&& (!closeMatch)) || (openMatch&& (!closeMatch)) || openMatch.length != closeMatch.length)){
+  document.write("Invalid ")
+  return "syntax"
+}else{
+while(e.indexOf(")") != -1){
+let commaSplit = e.split("(")
+let filterComma = commaSplit.filter((obj)=>obj.indexOf(")")!= -1)
+for(i=0;i<filterComma.length;i++){
+  let endPos = filterComma[i].indexOf(")")
+  let subStr = filterComma[i].substring(0,endPos)
+  let calcStr = handlebasicCalc(subStr)
+  e = e.replace("("+subStr+")",calcStr)
+}
+}
+return handlebasicCalc(e)
+}
+}
+
+
+function handlebasicCalc(e){
+while(e.indexOf("/") != -1){
+let exp = e.match(/[0-9]+\/[0-9]+/)[0]
+let divArr = exp.split("/")
+let firstNum = parseInt(divArr[0])
+let secondNum = parseInt(divArr[1])
+let result = parseInt(firstNum / secondNum)
+e = e.replace(/[0-9]+\/[0-9]+/,result)
+}
+
+while(e.indexOf("*") != -1){
+let exp = e.match(/[0-9]+\*[0-9]+/)[0]
+let divArr = exp.split("*")
+let firstNum = parseInt(divArr[0])
+let secondNum = parseInt(divArr[1])
+let result = parseInt(firstNum * secondNum)
+e = e.replace(/[0-9]+\*[0-9]+/,result)
+}
+while(e.indexOf("+") != -1){
+let exp = e.match(/[0-9]+\+[0-9]+/)[0]
+let divArr = exp.split("+")
+let firstNum = parseInt(divArr[0])
+let secondNum = parseInt(divArr[1])
+let result = parseInt(firstNum + secondNum)
+e = e.replace(/[0-9]+\+[0-9]+/,result)
+}
+while(e.indexOf("-") != -1 && e.match(/[0-9]+\-[0-9]+/)){
+let exp = e.match(/[0-9]+\-[0-9]+/)[0]
+let divArr = exp.split("-")
+let firstNum = parseInt(divArr[0])
+let secondNum = parseInt(divArr[1])
+let result = parseInt(firstNum - secondNum)
+e = e.replace(/[0-9]+\-[0-9]+/,result)
+}
+console.log(e)
+return e
+}
+</script>
+</body>
+</html>
